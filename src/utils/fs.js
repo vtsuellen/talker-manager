@@ -5,6 +5,13 @@ const readFiles = async () => {
   return JSON.parse(data); 
 };
 
+const getTalkerById = async (id) => {
+  const data = await readFiles();
+  const newData = data.find((talker) => talker.id === id);
+  return newData;
+};
+
 module.exports = {
   readFiles,
+  getTalkerById,
 };
