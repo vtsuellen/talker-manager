@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const { readFiles, getTalkerById, generateToken } = require('../utils/fs');
+const { validateLogin } = require('../middlewares/validateLogin');
 
 const router = Router();
 
@@ -15,7 +16,7 @@ router.get('/talker/:id', async (_req, res) => {
   return res.status(200).json(talkers); 
 });
 
-router.post('/login', async (_req, res) => {
+router.post('/login', validateLogin, async (_req, res) => {
   const token = generateToken(16);
   if (!token) return res.status(401).json({ message: 'Email e senha são obrigatórios' });
   return res.status(200).json({ token });
