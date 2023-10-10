@@ -20,8 +20,19 @@ const generateToken = (length) => {
   return token;
 };
 
+const getTalkers = () => {
+  const talkers = readFiles();
+  return talkers;
+};
+
+const addTalker = async (talker) => {
+  await fs.writeFile('src/talker.json', JSON.stringify(talker));
+};
+
 module.exports = {
   readFiles,
   getTalkerById,
   generateToken,
+  getTalkers,
+  addTalker,
 };
