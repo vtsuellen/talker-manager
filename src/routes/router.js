@@ -1,6 +1,10 @@
 const { Router } = require('express');
 const statusCode = require('../utils/statusCode');
-const { readFiles, getTalkerById, generateToken, getTalkers, addTalker } = require('../utils/fs');
+const { readFiles,
+  getTalkerById,
+  generateToken,
+  getTalkers, 
+  updateTalker } = require('../utils/fs');
 const { validateLogin } = require('../middlewares/validateLogin');
 const { validateAge } = require('../middlewares/validateAge');
 const { validateName } = require('../middlewares/validateName');
@@ -48,7 +52,7 @@ router.post('/talker',
       const talkers = await getTalkers();
       const newTalker = { ..._req.body, id: talkers.length + 1 };
       talkers.push(newTalker);
-      await addTalker(talkers);
+      await updateTalker(talkers);
       console.log(newTalker);
       return res.status(statusCode.CREATED).json(newTalker);
     } catch (error) {
@@ -66,7 +70,7 @@ router.put('/talker/:id',
   validateWatchedAt,
   async (_req, res) => {
     try {
-      const talkers = await readFiles();
+      const talkers = await getTalkers();
       const id = Number(_req.params.id);
       const index = talkers.findIndex((talker) => talker.id === id);
       if (index === -1) {
@@ -75,9 +79,28 @@ router.put('/talker/:id',
       }
       const newTalker = { ..._req.body, id };
       talkers[index] = newTalker;
-      await addTalker(talkers); 
+      await updateTalker(talkers); 
       
       return res.status(statusCode.OK).json(newTalker);
+    } catch (error) {
+      return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: error });
+    }
+  });
+
+router.delete('/talker/:id', 
+  validateToken,
+  async (_req, res) => {
+    try {
+      const { id } = _req.params;
+      const talkers = await getTalkers();
+      const index = talkers.findIndex((talker) => talker.id === Number(id));
+      if (index === -1) {
+        return res.status(statusCode.NOT_FOUND)
+          .json({ message: 'Pessoa palestrante não encontrada' });
+      }
+      const newTalkers = talkers.filter((talker) => talker.id !== Number(id));
+      await updateTalker(newTalkers);
+      return res.status(statusCode.NO_CONTENT).json();
     } catch (error) {
       return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: error });
     }

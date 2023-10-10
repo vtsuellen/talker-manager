@@ -25,7 +25,7 @@ const getTalkers = () => {
   return talkers;
 };
 
-const addTalker = async (talker) => {
+const updateTalker = async (talker) => {
   await fs.writeFile('src/talker.json', JSON.stringify(talker));
 };
 
@@ -34,5 +34,5 @@ module.exports = {
   getTalkerById,
   generateToken,
   getTalkers,
-  addTalker,
+  updateTalker,
 };
