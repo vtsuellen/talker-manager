@@ -57,4 +57,30 @@ router.post('/talker',
     }
   });
 
+router.put('/talker/:id',
+  validateToken, 
+  validateAge,
+  validateName,
+  validateTalk,
+  validateRate, 
+  validateWatchedAt,
+  async (_req, res) => {
+    try {
+      const talkers = await readFiles();
+      const id = Number(_req.params.id);
+      const index = talkers.findIndex((talker) => talker.id === id);
+      if (index === -1) {
+        return res.status(statusCode.NOT_FOUND)
+          .json({ message: 'Pessoa palestrante não encontrada' });
+      }
+      const newTalker = { ..._req.body, id };
+      talkers[index] = newTalker;
+      await addTalker(talkers); 
+      
+      return res.status(statusCode.OK).json(newTalker);
+    } catch (error) {
+      return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: error });
+    }
+  });
+
 module.exports = router;
